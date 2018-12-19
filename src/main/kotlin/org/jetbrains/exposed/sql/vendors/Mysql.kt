@@ -45,7 +45,9 @@ internal object MysqlDialect : VendorDialect("mysql", MysqlDataTypeProvider, Mys
         val rs = TransactionManager.current().connection.createStatement().executeQuery(
                 "SELECT DISTINCT TABLE_NAME, COLUMN_NAME, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '${getDatabase()}'")
         return rs.extractColumns(tables) {
-            Triple(it.getString("TABLE_NAME")!!, it.getString("COLUMN_NAME")!!, it.getBoolean("IS_NULLABLE"))
+            val nullableString = it.getString("IS_NULLABLE")
+            val nullable = nullableString == "YES"
+            Triple(it.getString("TABLE_NAME")!!, it.getString("COLUMN_NAME")!!, nullable)
         }
     }
 
